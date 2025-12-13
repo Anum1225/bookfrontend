@@ -24,31 +24,41 @@ const Chatbot = React.forwardRef<ChatbotRef>((props, ref) => {
     const [isUrdu, setIsUrdu] = useState(false);
     const [isPersonalized, setIsPersonalized] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    
-    const userId = localStorage.getItem('user_id') || 'guest';
-    const storageKey = `chatHistory_${userId}`;
-    
-    const [messages, setMessages] = useState<Message[]>(() => {
-        const saved = localStorage.getItem(storageKey);
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                return parsed.map(m => ({ ...m, timestamp: new Date(m.timestamp) }));
-            } catch { }
-        }
-        return [{
-            id: '1',
-            text: "Hello! I'm your Physical AI assistant. Ask me about ROS 2 or Robotics.",
-            sender: 'bot',
-            timestamp: new Date()
-        }];
-    });
+
+    const [userId, setUserId] = useState('guest');
+    const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+
+    // Initial state with default message only - loading from localStorage happens in useEffect
+    const [messages, setMessages] = useState<Message[]>([{
+        id: '1',
+        text: "Hello! I'm your Physical AI assistant. Ask me about ROS 2 or Robotics.",
+        sender: 'bot',
+        timestamp: new Date()
+    }]);
 
     const startMessages = [
         "What is Physical AI?",
         "Explain ROS 2 nodes",
         "How to set up Isaac Sim?"
     ];
+
+    // Load history on mount
+    useEffect(() => {
+        const currentUserId = localStorage.getItem('user_id') || 'guest';
+        setUserId(currentUserId);
+
+        const storageKey = `chatHistory_${currentUserId}`;
+        const saved = localStorage.getItem(storageKey);
+
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                setMessages(parsed.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) })));
+            } catch { }
+        }
+    }, []);
+
+    const storageKey = `chatHistory_${userId}`;
 
     React.useImperativeHandle(ref, () => ({
         openChat: (msg?: string) => {
@@ -87,7 +97,7 @@ const Chatbot = React.forwardRef<ChatbotRef>((props, ref) => {
     useEffect(() => {
         if (isOpen) scrollToBottom();
     }, [messages, isTyping, isOpen]);
-    
+
     useEffect(() => {
         localStorage.setItem(storageKey, JSON.stringify(messages));
     }, [messages, storageKey]);
@@ -135,14 +145,14 @@ const Chatbot = React.forwardRef<ChatbotRef>((props, ref) => {
             if (!res.ok) throw new Error(data.detail || 'Failed to get response');
 
             let botText = data.response;
-            
+
             // Enhanced formatting
             let formattedText = botText
                 .replace(/\*\*\*(.+?)\*\*\*/g, '<b><i>$1</i></b>')
                 .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
                 .replace(/\*(.+?)\*/g, '<i>$1</i>')
                 .replace(/`(.+?)`/g, '<code>$1</code>');
-            
+
             // Tables
             formattedText = formattedText.replace(/\|(.+?)\|/g, (match) => {
                 const cells = match.split('|').filter(c => c.trim());
@@ -151,7 +161,7 @@ const Chatbot = React.forwardRef<ChatbotRef>((props, ref) => {
             if (formattedText.includes('<tr>')) {
                 formattedText = '<table>' + formattedText + '</table>';
             }
-            
+
             // Lists with emojis for personalized mode
             if (isPersonalized) {
                 formattedText = formattedText
@@ -167,7 +177,7 @@ const Chatbot = React.forwardRef<ChatbotRef>((props, ref) => {
                     formattedText = '<ul>' + formattedText + '</ul>';
                 }
             }
-            
+
             formattedText = formattedText.replace(/\n/g, '<br/>');
 
             const botMsg: Message = {
@@ -224,16 +234,16 @@ const Chatbot = React.forwardRef<ChatbotRef>((props, ref) => {
                             <div className={styles.onlineBadge} />
                         </div>
                         <div className={styles.headerActions}>
-                            <button 
-                                className={`${styles.iconBtn} ${isUrdu ? styles.active : ''}`} 
-                                onClick={() => setIsUrdu(!isUrdu)} 
+                            <button
+                                className={`${styles.iconBtn} ${isUrdu ? styles.active : ''}`}
+                                onClick={() => setIsUrdu(!isUrdu)}
                                 title="Toggle Urdu"
                             >
                                 <Languages size={16} />
                             </button>
-                            <button 
-                                className={`${styles.iconBtn} ${isPersonalized ? styles.active : ''}`} 
-                                onClick={() => setIsPersonalized(!isPersonalized)} 
+                            <button
+                                className={`${styles.iconBtn} ${isPersonalized ? styles.active : ''}`}
+                                onClick={() => setIsPersonalized(!isPersonalized)}
                                 title="Personalize"
                             >
                                 <Smile size={16} />
