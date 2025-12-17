@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from '@docusaurus/Link';
+import { API_BASE_URL } from '../config';
 
 export const PersonalizationButton = () => {
     const [loading, setLoading] = React.useState(false);
@@ -20,7 +21,7 @@ export const PersonalizationButton = () => {
         setLoading(true);
         try {
             const textContent = targetEl.innerText;
-            const res = await fetch('http://localhost:8000/api/personalize', {
+            const res = await fetch(`${API_BASE_URL}/personalize`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -85,7 +86,7 @@ export const UrduTranslationButton = () => {
 
         try {
             const textContent = targetEl.innerText;
-            const res = await fetch('http://localhost:8000/api/translate', {
+            const res = await fetch(`${API_BASE_URL}/translate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

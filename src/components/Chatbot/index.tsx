@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './styles.module.css';
 import { MessageSquare, X, Send, Bot, Sparkles, Trash2, Languages, Smile } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 interface Message {
     id: string;
@@ -128,7 +129,9 @@ const Chatbot = React.forwardRef<ChatbotRef>((props, ref) => {
 
             const userId = localStorage.getItem('user_id');
 
-            const res = await fetch('http://localhost:8000/api/chat', {
+
+
+            const res = await fetch(`${API_BASE_URL}/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

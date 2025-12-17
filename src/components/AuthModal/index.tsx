@@ -7,6 +7,7 @@ import {
     GraduationCap, Briefcase, Trophy, Rocket // Experience
 } from 'lucide-react';
 import styles from './styles.module.css';
+import { API_BASE_URL } from '../../config';
 
 interface AuthModalProps {
     isOpen: boolean;
@@ -29,7 +30,7 @@ export default function AuthModal({ isOpen, onClose, initialView = 'login' }: Au
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const API_URL = 'http://localhost:8000/api';
+
 
     // Reset when opened
     useEffect(() => {
@@ -48,7 +49,7 @@ export default function AuthModal({ isOpen, onClose, initialView = 'login' }: Au
         setLoading(true);
         setError('');
         try {
-            const res = await fetch(`${API_URL}/auth/login`, {
+            const res = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(loginData)
@@ -82,7 +83,7 @@ export default function AuthModal({ isOpen, onClose, initialView = 'login' }: Au
         setError('');
         try {
             // 1. Signup
-            const signupRes = await fetch(`${API_URL}/auth/signup`, {
+            const signupRes = await fetch(`${API_BASE_URL}/auth/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(signupData)
@@ -101,7 +102,7 @@ export default function AuthModal({ isOpen, onClose, initialView = 'login' }: Au
                 preferred_language: 'en' // Default for now
             };
 
-            await fetch(`${API_URL}/auth/profile/${userData.user_id}`, {
+            await fetch(`${API_BASE_URL}/auth/profile/${userData.user_id}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(profileData)

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import { User, Mail, Shield, Zap, Code, LogOut } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 export default function Profile() {
     const [user, setUser] = useState<{ id: string, name: string, email: string } | null>(null);
@@ -21,9 +22,11 @@ export default function Profile() {
         }
     }, []);
 
+
+
     const fetchProfile = async (id: string) => {
         try {
-            const res = await fetch(`http://localhost:8000/api/auth/profile/${id}`);
+            const res = await fetch(`${API_BASE_URL}/auth/profile/${id}`);
             if (res.ok) {
                 const data = await res.json();
                 setProfile(data);
